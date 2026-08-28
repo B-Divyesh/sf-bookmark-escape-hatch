@@ -1,0 +1,24 @@
+{
+  "name": "bookmark-escape-hatch",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run && npm run test:e2e",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "preview": "vite preview",
+    "assets": "node scripts/optimize-images.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@types/node": "22.15.30",
+    "playwright": "1.58.2",
+    "sharp": "0.35.4",
+    "typescript": "5.8.3",
+    "vite": "6.4.3",
+    "vitest": "3.2.7"
+  }
+}

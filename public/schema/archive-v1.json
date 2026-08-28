@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bookmark-escape-hatch.sociobot.in/schema/archive-v1.json",
+  "title": "Bookmark Escape Hatch neutral archive",
+  "type": "object",
+  "required": ["schema", "version", "createdAt", "provenance", "summary", "records"],
+  "properties": {
+    "schema": { "const": "https://bookmark-escape-hatch.sociobot.in/schema/archive-v1.json" },
+    "version": { "const": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "provenance": { "type": "object" },
+    "summary": { "type": "object" },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "url", "title", "tags", "source", "extras"],
+        "properties": {
+          "id": { "type": "string" },
+          "url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+          "title": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "archivedAt": { "type": "string", "format": "date-time" },
+          "description": { "type": "string" },
+          "folder": { "type": "string" },
+          "source": { "type": "object" },
+          "extras": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}
