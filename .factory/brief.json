@@ -1,0 +1,11 @@
+{
+  "slug": "bookmark-escape-hatch",
+  "title": "Bookmark Escape Hatch",
+  "territory": "utilities",
+  "user": "People with years of browser and service bookmarks who need a reliable, inspectable export before changing tools or services.",
+  "smallest_useful_product": "Local browser/CLI utility that imports HTML/JSON/CSV exports, normalizes URLs/tags/dates, detects duplicates and malformed records, produces a vendor-neutral archive plus a destination-specific dry-run report.",
+  "success_measure": "For supported exports, 99% of valid input records round-trip through the neutral format, and the report identifies every unsupported field before import.",
+  "artifact_class": "pwa-offline",
+  "monetization": "free",
+  "constraints": "Process exports locally; avoid downloading protected article content; use documented formats; preserve source attribution and archive timestamps where present."
+}

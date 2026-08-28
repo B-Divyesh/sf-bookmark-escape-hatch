@@ -1,0 +1,8 @@
+{
+  "model": "factory-image (Azure AI Foundry)",
+  "generated": "2026-08-28",
+  "size": "1536x1024",
+  "quality": "high",
+  "prompt": "Use case: stylized-concept. Asset type: landing page hero illustration. Scene: a compact 1960s electronics laboratory bookmark portability test bench on a clean parchment background. Subject: abstract paper bookmark cards enter a cream enamel and deep green-black testing console from the upper left, pass through three calibrated channels with small glass indicator lamps and mechanical gauges, then emerge as one neat verified archive report at lower right. Style: precise editorial gouache and screenprint illustration, subtle paper grain, mid-century industrial manual, no photorealism. Composition: elevated three-quarter isometric product view, single self-contained machine, generous clean perimeter, no cropped edges. Lighting: warm directional studio light with short soft shadows. Palette: parchment cream, deep green-black, burnt safety orange, muted teal, brushed aluminum. Materials: cream enamel, charcoal Bakelite, brushed aluminum, paper, glass indicator lamps. Constraints: conceptual data migration only, simple geometric marks allowed. Avoid: people, hands, brands, logos, readable text, letters, numbers, watermark, gradients, neon, glossy modern screens, UI screenshot, cables leaving frame.",
+  "review": "Accepted: clear intake/check/output story, coherent palette, no brand, watermark, person, seam, or legible-text artifact. Abstract geometric marks are intentional."
+}
