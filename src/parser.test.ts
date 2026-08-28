@@ -26,10 +26,11 @@ describe('bookmark export parser', () => {
   });
 
   it('flattens nested JSON and preserves vendor-specific fields', () => {
-    const result = parseBookmarkExport(JSON.stringify({ bookmarks: [{ name: 'Folder', children: [{ href: 'https://example.net', name: 'Example', dateAdded: 1704067200000, importantFlag: true }] }] }), 'chrome.json');
+    const result = parseBookmarkExport(JSON.stringify({ bookmarks: [{ name: 'Folder', children: [{ href: 'https://example.net', name: 'Example', dateAdded: 1704067200000, importantFlag: true }, { href: 'https://chromium.example', name: 'Chromium epoch', date_added: '13348540800000000' }] }] }), 'chrome.json');
     expect(result.records[0].folder).toBe('Folder');
     expect(result.records[0].createdAt).toBe('2024-01-01T00:00:00.000Z');
     expect(result.records[0].extras.importantFlag).toBe(true);
+    expect(result.records[1].createdAt).toBe('2024-01-01T00:00:00.000Z');
   });
 
   it('parses quoted CSV including commas and line breaks', () => {
