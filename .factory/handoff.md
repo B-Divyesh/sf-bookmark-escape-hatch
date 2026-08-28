@@ -89,9 +89,37 @@ timeouts and no INP number is claimed in product copy.
 
 ## Deployment and live identity
 
-Deployment and post-deploy byte/response checks are the final work-order step. Their
-exact commit, live digests, status codes, and verify-url evidence will be appended
-after Azure Static Web Apps accepts the committed repair.
+Commit `b10bc0e6419d7350461fbef7495695e23ca0cbd5` was pushed to `origin/main` and
+deployed through `/opt/fleet/lib/deploy-static.sh bookmark-escape-hatch dist`.
+Azure Static Web Apps deployment `d319a310-9488-4aeb-a71b-3d66a4b3b5aa` succeeded
+and the custom domain returned HTTPS 200.
+
+Live files matched the committed `dist/` byte-for-byte. Selected SHA-256 digests:
+
+```text
+index.html                    685c86689f31e3664c6309752554d5c15db45030f424eac85f4a4b5c60cdadea
+assets/index-DqRBzcB2.js     ac7b969de8c30ff45f0c9891cd9784a87c9b927ab01fa6ba6690c6e236004506
+assets/index-DiSK43a-.css    3b124b57945078010ecc8ff02b56365a22db6d96f1454ac347ab26af595146f2
+sw.js                         30d800122e4d453e72492b44344c6d6eac3233f436b2895ebe8dc98e7ab6a7f4
+manifest.webmanifest          1589467453e11aa6041981b17eafdcc340e541fe3e8a535740f32d2be8d1f8de
+404.html                      2319f43b29e4bb18be7e6991528eca32523f5e50af11952349a151e1dc897291
+```
+
+Live checks returned 200 for `/`, `/demo`, `/privacy/`, and `/terms/`; an unknown
+route returned the designed page with status 404. Live JS and AVIF returned
+one-year immutable caching; AVIF and the manifest returned `image/avif` and
+`application/manifest+json`. CSP was present on every checked response.
+
+`/opt/fleet/lib/verify-url.sh` reported an 839 ms load, zero console errors, one h1,
+one main landmark, zero missing alt attributes, and zero unlabeled buttons. Its HTML,
+JSON, desktop screenshot, and 390 px screenshot are in
+`.factory/evidence/repair-1/`.
+
+A separate live mobile run completed `/demo`, found no horizontal overflow or
+console errors, and reloaded the populated inspection offline. Live Axe checks on
+demo, privacy, and terms found zero serious/critical issues. Live Lighthouse 12.8.2
+scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO, with
+FCP 0.9 s, LCP 1.1 s, TBT 0 ms, CLS 0, and Speed Index 0.9 s.
 
 ## Known gaps and applicability
 
