@@ -1,5 +1,27 @@
 # Bookmark Escape Hatch repair handoff
 
+## Independent verification update — PASS
+
+**Verified candidate:** `701b718224cde8622b8be0f18375575702de31a3`
+**Verified URL:** <https://bookmark-escape-hatch.sociobot.in>
+**Date:** 2026-08-28
+
+An independent clean-checkout QA run passed. All eight exact commands in
+`.factory/claims.json`, `npm test` (12 unit/compliance and 17 applicable
+Playwright tests), `npm run lint`, and `npm run build` passed. The live
+deployment byte-matched 23/23 public production artifacts from the fresh build.
+
+The cold first screen meets the plain-words/demo gate on desktop and 390px:
+it states the job, names people with years of bookmarks, and presents one-click
+“Try it with sample data.” Live testing confirmed demo isolation, supported
+imports/exports, malformed-input recovery, offline demo reload, keyboard and
+reduced motion behavior, only same-origin requests, response headers/caching,
+and zero serious/critical live Axe findings. Lighthouse mobile: Performance 96,
+Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.0 s, CLS 0.
+
+No release-blocking, major, or minor defects remain. Full evidence is in
+`.factory/verification-2.md` and `.factory/evidence/verify-2/`.
+
 **Work order:** `bookmark-escape-hatch-repair-1`
 
 **Verifier report:** `f197155fb690a349987f0f8407e92708e9ada1aa`
