@@ -193,12 +193,50 @@ function normalize(raw: RawBookmark, index: number, fileName: string, format: So
   };
 }
 
+function normalizeNeutralRecord(raw: RawBookmark, index: number): BookmarkRecord {
+  const url = normalizeUrl(raw.url);
+  const source = raw.source;
+  const extras = raw.extras;
+  if (!source || typeof source !== 'object' || Array.isArray(source)) throw new Error('Neutral record has invalid source attribution');
+  if (!extras || typeof extras !== 'object' || Array.isArray(extras)) throw new Error('Neutral record has invalid vendor details');
+  const typedSource = source as RawBookmark;
+  const sourceFormat = text(typedSource.format);
+  if (!['html', 'json', 'csv'].includes(sourceFormat)) throw new Error('Neutral record has an unsupported source format');
+  return {
+    id: text(raw.id) || hash(`${url}|${index}|neutral`),
+    url,
+    title: text(raw.title) || new URL(url).hostname,
+    tags: parseTags(raw.tags),
+    createdAt: parseDate(raw.createdAt),
+    updatedAt: parseDate(raw.updatedAt),
+    archivedAt: parseDate(raw.archivedAt),
+    description: text(raw.description) || undefined,
+    folder: text(raw.folder) || undefined,
+    source: {
+      file: text(typedSource.file),
+      format: sourceFormat as SourceFormat,
+      index: Number(typedSource.index),
+    },
+    extras: structuredClone(extras) as Record<string, unknown>,
+  };
+}
+
 export function parseBookmarkExport(content: string, fileName = 'pasted-export.txt'): ParseResult {
   if (!content.trim()) throw new Error('The export is empty. Choose a file that contains bookmarks.');
   const format = detectFormat(fileName, content);
   let rawRows: RawBookmark[];
+  let isNeutralArchive = false;
   try {
-    rawRows = format === 'html' ? parseHtml(content) : format === 'csv' ? parseCsv(content) : flattenJson(JSON.parse(content));
+    if (format === 'html') rawRows = parseHtml(content);
+    else if (format === 'csv') rawRows = parseCsv(content);
+    else {
+      const json = JSON.parse(content) as unknown;
+      isNeutralArchive = Boolean(json && typeof json === 'object' && !Array.isArray(json)
+        && (json as RawBookmark).schema === 'https://bookmark-escape-hatch.sociobot.in/schema/archive-v1.json'
+        && (json as RawBookmark).version === 1
+        && Array.isArray((json as RawBookmark).records));
+      rawRows = isNeutralArchive ? (json as RawBookmark).records as RawBookmark[] : flattenJson(json);
+    }
   } catch (error) {
     if (error instanceof SyntaxError) throw new Error('The JSON export is incomplete or malformed. Export it again and retry.');
     throw error;
@@ -211,7 +249,7 @@ export function parseBookmarkExport(content: string, fileName = 'pasted-export.t
   const seen = new Map<string, string>();
   rawRows.forEach((raw, index) => {
     try {
-      const record = normalize(raw, index, fileName, format);
+      const record = isNeutralArchive ? normalizeNeutralRecord(raw, index) : normalize(raw, index, fileName, format);
       const original = seen.get(record.url);
       if (original) duplicates.push({ record, duplicateOf: original });
       else { seen.set(record.url, record.id); records.push(record); }

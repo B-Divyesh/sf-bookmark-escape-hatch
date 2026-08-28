@@ -1,0 +1,58 @@
+[
+  {
+    "id": "demo-sandbox",
+    "claim": "One click opens a completed sample inspection without reading or writing real inspection data.",
+    "where": "landing primary action, demo banner, README",
+    "test": "npm run test:e2e -- --project=chromium --grep @claim:demo-sandbox",
+    "sandbox": "fresh browser context; click the landing action; assert completed results, separate demo IndexedDB, reset, and clean exit"
+  },
+  {
+    "id": "local-processing",
+    "claim": "Bookmark contents stay on the device; there are no analytics, trackers, remote scripts, fonts, or bookmark-URL requests.",
+    "where": "landing facts, workbench, privacy page, README",
+    "test": "npm run test:e2e -- --project=chromium --grep @claim:local-processing",
+    "sandbox": "fresh browser context; capture every request through the full demo inspection and download; require same-origin only"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "The completed demo works offline after the first visit.",
+    "where": "landing facts, privacy page, README",
+    "test": "npm run test:e2e -- --project=chromium --grep @claim:offline-reload",
+    "sandbox": "fresh browser context; load /demo; wait for the worker; set the context offline; reload and assert the completed result"
+  },
+  {
+    "id": "input-audit",
+    "claim": "The workbench reads HTML, JSON, and CSV exports through 50 MB and reports duplicates, malformed records, and field loss.",
+    "where": "workbench, privacy page, README",
+    "test": "npm run test:e2e -- --project=chromium --grep @claim:input-audit",
+    "sandbox": "fresh browser context; inspect all three formats, check the exact byte boundary, and assert every sample finding"
+  },
+  {
+    "id": "export-files",
+    "claim": "The completed inspection downloads neutral JSON, browser HTML, Raindrop CSV, Linkwarden JSON, and a dry-run report.",
+    "where": "workbench, privacy page, README",
+    "test": "npm run test:e2e -- --project=chromium --grep @claim:export-files",
+    "sandbox": "fresh /demo context; download and read every destination file plus neutral and report files"
+  },
+  {
+    "id": "local-restore",
+    "claim": "A real completed inspection can be restored after refresh and explicitly cleared.",
+    "where": "privacy page, README",
+    "test": "npm run test:e2e -- --project=chromium --grep @claim:local-restore",
+    "sandbox": "fresh browser context; inspect a real local fixture, reload, restore, clear, and reload again"
+  },
+  {
+    "id": "neutral-roundtrip",
+    "claim": "Neutral archive re-import preserves normalized records, source attribution, and vendor details across repeated round trips.",
+    "where": "workbench, README",
+    "test": "npm run test:unit -- --testNamePattern @claim:neutral-roundtrip",
+    "sandbox": "representative JSON fixture with source attribution and a vendor field; export, import, export, and compare full record objects"
+  },
+  {
+    "id": "free-use",
+    "claim": "The complete workbench is free to use without an account or payment.",
+    "where": "landing facts, terms page, README",
+    "test": "npm run test:e2e -- --project=chromium --grep @claim:free-use",
+    "sandbox": "fresh browser context; assert the free fact and absence of payment, purchase, subscription, or sign-in controls"
+  }
+]

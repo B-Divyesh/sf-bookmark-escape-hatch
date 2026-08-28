@@ -3,7 +3,7 @@
   "short_name": "Escape Hatch",
   "description": "Inspect and normalize bookmark exports locally before you migrate.",
   "id": "/?source=pwa",
-  "start_url": "/?v=1",
+  "start_url": "/?v=2",
   "scope": "/",
   "display": "standalone",
   "background_color": "#e6ddc8",

@@ -60,13 +60,17 @@ describe('audit and export', () => {
     expect(report.unsupportedFields).toHaveLength(3);
   });
 
-  it('round-trips every valid record through neutral JSON', () => {
+  it('@claim:neutral-roundtrip preserves record shape through repeated neutral archive imports', () => {
     const audit = auditForDestination(parsed, 'neutral');
     const archive = neutralArchive(audit);
     const reparsed = parseBookmarkExport(archive, 'neutral.json');
+    const reexported = neutralArchive(auditForDestination(reparsed, 'neutral'));
+    const reparsedAgain = parseBookmarkExport(reexported, 'neutral-again.json');
     expect(reparsed.records).toHaveLength(parsed.records.length);
-    expect(reparsed.records[0].url).toBe(parsed.records[0].url);
-    expect(JSON.parse(archive).records[0].extras.custom).toBe('kept');
+    expect(reparsed.records).toEqual(parsed.records);
+    expect(reparsedAgain.records).toEqual(parsed.records);
+    expect(reparsed.records[0].source).toEqual({ file: 'links.json', format: 'json', index: 0 });
+    expect(reparsed.records[0].extras).toEqual({ custom: 'kept' });
   });
 
   it('creates valid destination payloads', () => {

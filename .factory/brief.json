@@ -1,6 +1,7 @@
 {
   "slug": "bookmark-escape-hatch",
   "title": "Bookmark Escape Hatch",
+  "summary": "Inspect bookmark exports and find migration damage before changing tools.",
   "territory": "utilities",
   "user": "People with years of browser and service bookmarks who need a reliable, inspectable export before changing tools or services.",
   "smallest_useful_product": "Local browser/CLI utility that imports HTML/JSON/CSV exports, normalizes URLs/tags/dates, detects duplicates and malformed records, produces a vendor-neutral archive plus a destination-specific dry-run report.",

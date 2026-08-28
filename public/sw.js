@@ -1,7 +1,7 @@
-const VERSION = 'escape-hatch-v1';
+const VERSION = 'escape-hatch-v2';
 const SHELL = [
-  '/', '/index.html', '/offline.html', '/manifest.webmanifest',
-  '/icon-192.png', '/icon-512.png',
+  '/', '/index.html', '/demo', '/offline.html', '/manifest.webmanifest',
+  '/favicon.svg', '/apple-touch-icon.png', '/icon-192.png', '/icon-512.png',
   '/assets/test-bench-720.webp', '/assets/test-bench-720.avif',
   '/privacy/', '/terms/'
 ];
@@ -14,7 +14,6 @@ self.addEventListener('install', (event) => {
     const builtAssets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+\.(?:js|css))"/g)].map((match) => match[1]);
     await cache.addAll(builtAssets);
   })());
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

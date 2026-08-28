@@ -1,83 +1,64 @@
 # Bookmark Escape Hatch
 
-Bookmark Escape Hatch is a private, offline-capable migration workbench for people
-with years of browser or bookmark-service data. It reads an export, normalizes the
-records, separates exact duplicates and malformed links, and reports every populated
-field the chosen destination cannot represent before producing import-ready files.
+Inspect bookmark exports and find migration damage before changing tools.
 
-Live product: <https://bookmark-escape-hatch.sociobot.in>
+Bookmark Escape Hatch is for people with years of browser or service bookmarks.
+It reads HTML, JSON, and CSV exports through 50 MB. It reports exact duplicates,
+malformed links, and populated fields that a selected destination cannot carry.
 
-## What it supports
+Try the isolated sample at <https://bookmark-escape-hatch.sociobot.in/demo>.
+One click opens a completed inspection. Demo records use a separate IndexedDB
+database and never replace a real saved inspection.
 
-- Netscape Bookmark HTML from major browsers, including folders, tags, notes, and
-  saved dates.
-- JSON arrays and common nested `bookmarks`, `links`, `items`, `children`, `data`,
-  `results`, and `records` shapes. Unknown vendor fields are preserved in `extras`.
-- Quoted CSV with URL/link, title/name, tags, notes, folder/collection, and date
-  header aliases.
-- Destination dry runs for neutral JSON, browser HTML, Raindrop CSV, and Linkwarden
-  JSON.
-- Downloads for the destination payload, the versioned neutral archive, and a
-  machine-readable dry-run report.
+## Output and privacy
 
-Exact URL duplicates are listed and excluded from generated payloads. Malformed or
-non-HTTP(S) records are held back with a reason. The original file is never changed.
+The workbench downloads neutral JSON, browser HTML, Raindrop CSV, Linkwarden JSON,
+and a machine-readable dry-run report. Neutral archive re-import preserves each
+normalized record, its source attribution, and vendor details across round trips.
 
-## Privacy and local storage
+Bookmark contents stay on the device. The app never requests a bookmark URL and
+has no analytics, trackers, remote scripts, or third-party fonts. A real completed
+inspection can be restored after refresh and explicitly cleared. The completed demo
+also reloads offline after its first visit.
 
-Parsing and export generation happen entirely in the browser. The app does not fetch
-bookmark URLs and has no analytics, trackers, remote scripts, or third-party fonts.
-The latest completed inspection is stored in IndexedDB for explicit restore after a
-refresh; “Clear saved inspection” removes it. See the in-product [privacy
-policy](https://bookmark-escape-hatch.sociobot.in/privacy/).
+The complete workbench is free to use without an account or payment. Read the
+[privacy policy](https://bookmark-escape-hatch.sociobot.in/privacy/) and
+[terms](https://bookmark-escape-hatch.sociobot.in/terms/).
 
-## Run locally
+## Run and verify
 
-Requires Node.js 20 or newer.
+Node.js 20 or newer is required.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Vite prints the local development URL. To test the production output:
+Run all unit, integration, desktop, mobile, offline, and accessibility checks:
 
 ```sh
+npm test
+npm run lint
 npm run build
-npm run preview
 ```
 
-The exact deploy command is `npm run build`. It writes the static application to
-`dist/`, with `dist/index.html` at the root.
-
-## Test and verify
-
-```sh
-npm test              # unit + Chromium desktop/mobile/offline/axe tests
-npm run test:unit     # parser, audit, and round-trip coverage
-npm run test:e2e      # Playwright flows and accessibility scan
-npm run assets        # regenerate optimized AVIF/WebP and PWA icon derivatives
-```
-
-Playwright is pinned to 1.58.2. The end-to-end suite starts a production preview,
-checks the complete migration path, exercises the 390 px layout and keyboard tabs,
-and reloads the app with its browser context offline.
+`npm run build` creates the deployable static site in `dist/`. Playwright is pinned
+to 1.58.2. Each product claim and its exact command are listed in
+[.factory/claims.json](.factory/claims.json). Demo setup and isolation are recorded
+in [.factory/demo.md](.factory/demo.md).
 
 ## Project map
 
-- `src/parser.ts` — format detection, parsing, normalization, deduplication
-- `src/audit.ts` — destination capability profiles and field-loss accounting
-- `src/exporters.ts` — neutral archive, browser, Raindrop, Linkwarden, and report files
-- `src/storage.ts` — minimal IndexedDB persistence
-- `public/sw.js` — versioned app-shell and runtime asset cache
-- `.factory/design.md` — visual thesis, tokens, interaction grammar, asset provenance
-- `public/schema/archive-v1.json` — the neutral archive JSON Schema
-
-## Scope and safety
+- `src/parser.ts` parses, normalizes, and deduplicates exports.
+- `src/audit.ts` checks destination field support.
+- `src/exporters.ts` creates the five downloadable formats.
+- `src/storage.ts` separates real and demo IndexedDB data.
+- `public/sw.js` controls the offline shell and consent-based updates.
+- `public/staticwebapp.config.json` defines routes, security headers, caching, MIME types, and 404 behavior.
+- `.factory/design.md` records the visual system and original asset provenance.
 
 This is an inspection and conversion tool, not a bookmark manager or content
-archiver. It deliberately does not download linked pages or protected article
-content. Destination services may change their formats; keep the original export and
-test a small import before deleting source data.
+archiver. Keep the original export and test a small destination import before
+deleting source data.
 
 MIT licensed. See [LICENSE](./LICENSE).

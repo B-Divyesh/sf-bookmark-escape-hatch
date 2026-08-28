@@ -97,6 +97,9 @@ region.
 - Source PNG and prompt sidecar live in `assets/src/`; optimized WebP/AVIF versions
   live in `public/assets/`. Candidates are visually reviewed for text artifacts,
   seams, unintended logos/symbols, and palette fit before use.
+- The 1200×630 social card is a deterministic crop of the same original console
+  art with a hand-authored enamel overlay. `npm run assets` reproduces it; no new
+  third-party material is introduced.
 
 ## Accessibility intent
 

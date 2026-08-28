@@ -13,6 +13,9 @@ let restorableAudit: AuditResult | undefined;
 let activeTab: 'summary' | 'records' | 'loss' = 'summary';
 let installPrompt: Event & { prompt?: () => Promise<void> } | undefined;
 let acceptedUpdate = false;
+const demoMode = location.pathname === '/demo' || new URLSearchParams(location.search).get('demo') === '1';
+const storageNamespace = demoMode ? 'demo' : 'real';
+const BUILD_LABEL = 'v1.0.1 · repair-1';
 
 const sample = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <TITLE>Bookmarks</TITLE><H1>Bookmarks</H1><DL><p>
@@ -38,6 +41,16 @@ function profileOptions(selected: DestinationId): string {
 }
 
 function render(): void {
+  document.title = demoMode ? 'Demo — Bookmark Escape Hatch' : 'Bookmark Escape Hatch — inspect bookmark exports';
+  const socialTitle = demoMode ? 'Demo — Bookmark Escape Hatch' : 'Inspect bookmarks before you move';
+  document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.setAttribute('content', socialTitle);
+  document.querySelector<HTMLMetaElement>('meta[name="twitter:title"]')?.setAttribute('content', socialTitle);
+  document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.setAttribute('content', demoMode
+    ? 'https://bookmark-escape-hatch.sociobot.in/demo'
+    : 'https://bookmark-escape-hatch.sociobot.in/');
+  document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute('href', demoMode
+    ? 'https://bookmark-escape-hatch.sociobot.in/demo'
+    : 'https://bookmark-escape-hatch.sociobot.in/');
   const destination = (document.querySelector<HTMLSelectElement>('#destination')?.value as DestinationId | undefined) ?? currentAudit?.destination ?? 'neutral';
   app.innerHTML = `
     <header class="site-header">
@@ -45,22 +58,25 @@ function render(): void {
         <span class="mark" aria-hidden="true"><i></i></span>
         <span>Bookmark<br><b>Escape Hatch</b></span>
       </a>
+      <nav class="site-nav" aria-label="Main navigation"><a href="/#workbench">Workbench</a><a href="/demo">Demo</a><a href="/privacy/">Privacy</a></nav>
       <div class="header-status">
         <span class="network-lamp ${navigator.onLine ? 'is-online' : 'is-offline'}" aria-hidden="true"></span>
         <span id="network-label">${navigator.onLine ? 'Local bench ready' : 'Offline mode'}</span>
       </div>
       <button class="text-button install-button" type="button" hidden>Install app</button>
     </header>
-    <main id="main">
+    ${demoMode ? `<aside class="demo-banner" aria-label="Demo mode"><strong>Demo — sample data, nothing is saved to your bookmarks</strong><div><button class="text-button reset-demo" type="button">Reset demo</button><button class="secondary-button start-real" type="button">Start for real</button></div></aside>` : ''}
+    <main id="main" tabindex="-1">
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
           <p class="kicker"><span>Portable by proof</span> / Station 01</p>
-          <h1 id="page-title">Know what survives<br><em>before you move.</em></h1>
-          <p class="lede">Load a bookmark export. This private workbench normalizes the links, finds damage and duplicates, then proves what your next tool can carry.</p>
+          <h1 id="page-title">Inspect bookmarks<br><em>before you move.</em></h1>
+          <p class="lede">For people with years of bookmarks, this workbench finds migration damage before they change tools.</p>
+          <div class="hero-action"><a class="primary-cta" href="/demo#readout">Try it with sample data</a><p>One click opens a completed, isolated inspection.</p></div>
           <ul class="trust-strip" aria-label="Product guarantees">
             <li><span aria-hidden="true">01</span> Stays on device</li>
             <li><span aria-hidden="true">02</span> Works offline</li>
-            <li><span aria-hidden="true">03</span> Open exports</li>
+            <li><span aria-hidden="true">03</span> Free to use</li>
           </ul>
         </div>
         <figure class="hero-art">
@@ -92,7 +108,7 @@ function render(): void {
               <textarea id="paste-input" rows="6" spellcheck="false" placeholder="Paste HTML, JSON, or CSV here">${sourceName === 'pasted-export.txt' ? esc(sourceContent) : ''}</textarea>
               <button class="secondary-button paste-button" type="button" aria-label="Use pasted export text">Use pasted text</button>
             </details>
-            <button class="sample-button" type="button">Load a 3-record sample</button>
+            <button class="sample-button" type="button">${demoMode ? 'Reset the sample inspection' : 'Try the sample in demo mode'}</button>
 
             <div class="panel-rule" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
             <div class="stage-label"><span>2</span><div><b>Set destination</b><small>Changes what the dry run checks</small></div></div>
@@ -103,7 +119,7 @@ function render(): void {
             <button class="primary-button inspect-button" type="button" ${sourceContent ? '' : 'disabled'}>
               <span>Run inspection</span><span aria-hidden="true">→</span>
             </button>
-            <p class="privacy-note"><span aria-hidden="true">●</span> Parsing happens only in this tab. No URLs are requested.</p>
+            <p class="privacy-note"><span aria-hidden="true">●</span> Parsing happens on this device. Bookmark URLs are never requested.</p>
           </div>
           <div class="readout-panel" id="readout">${renderReadout()}</div>
         </div>
@@ -120,8 +136,8 @@ function render(): void {
       </section>
     </main>
     <footer class="site-footer">
-      <div><b>Bookmark Escape Hatch</b><p>A free, local-first portability instrument.</p></div>
-      <nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-bookmark-escape-hatch">Source</a></nav>
+      <div><b>Bookmark Escape Hatch</b><p>Inspect bookmark exports before changing tools.</p><p>Built by Param Factory · ${BUILD_LABEL}</p></div>
+      <nav aria-label="Footer navigation"><a href="/demo">Demo</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-bookmark-escape-hatch" rel="external">Source</a></nav>
       <p class="asset-credit">Instrument illustration generated for this product with the factory image model.</p>
     </footer>
     <div class="toast" role="status" aria-live="polite" aria-atomic="true" id="toast"></div>
@@ -212,7 +228,15 @@ function bindEvents(): void {
     if (!value.trim()) return showError('Paste some HTML, JSON, or CSV export text first.');
     sourceContent = value; sourceName = 'pasted-export.txt'; currentAudit = undefined; render();
   });
-  document.querySelector('.sample-button')?.addEventListener('click', () => { sourceContent = sample; sourceName = 'sample-bookmarks.html'; currentAudit = undefined; render(); announce('Sample loaded. Run the inspection when ready.'); });
+  document.querySelector('.sample-button')?.addEventListener('click', () => {
+    if (!demoMode) { location.assign('/demo#readout'); return; }
+    void resetDemo();
+  });
+  document.querySelector('.reset-demo')?.addEventListener('click', () => { void resetDemo(); });
+  document.querySelector('.start-real')?.addEventListener('click', async () => {
+    await clearAudit('demo');
+    location.assign('/#workbench');
+  });
   document.querySelector<HTMLSelectElement>('#destination')?.addEventListener('change', (event) => {
     const selected = (event.currentTarget as HTMLSelectElement).value as DestinationId;
     const description = document.querySelector('#profile-description'); if (description) description.textContent = PROFILES[selected].description;
@@ -231,7 +255,7 @@ function bindEvents(): void {
   document.querySelector('.destination-download')?.addEventListener('click', () => { if (!currentAudit) return; const file = destinationExport(currentAudit); download(file.content, `escape-hatch-${currentAudit.destination}.${file.extension}`, file.mime); });
   document.querySelector('.neutral-download')?.addEventListener('click', () => { if (currentAudit) download(neutralArchive(currentAudit), 'escape-hatch-neutral-archive.json', 'application/json'); });
   document.querySelector('.report-download')?.addEventListener('click', () => { if (currentAudit) download(dryRunReport(currentAudit), `escape-hatch-${currentAudit.destination}-dry-run.json`, 'application/json'); });
-  document.querySelectorAll('.clear-button').forEach((button) => button.addEventListener('click', async () => { await clearAudit(); currentAudit = undefined; restorableAudit = undefined; sourceContent = ''; sourceName = ''; render(); announce('Saved inspection cleared.'); }));
+  document.querySelectorAll('.clear-button').forEach((button) => button.addEventListener('click', async () => { await clearAudit(storageNamespace); currentAudit = undefined; restorableAudit = undefined; sourceContent = ''; sourceName = ''; render(); announce(demoMode ? 'Demo inspection cleared.' : 'Saved inspection cleared.'); }));
   const install = document.querySelector<HTMLButtonElement>('.install-button');
   if (install && installPrompt) { install.hidden = false; install.addEventListener('click', async () => { await installPrompt?.prompt?.(); installPrompt = undefined; install.hidden = true; }); }
 }
@@ -254,7 +278,7 @@ async function inspect(): Promise<void> {
     const destination = document.querySelector<HTMLSelectElement>('#destination')!.value as DestinationId;
     currentAudit = auditForDestination(parsed, destination);
     activeTab = 'summary';
-    await saveAudit(currentAudit);
+    await saveAudit(currentAudit, storageNamespace);
     render();
     document.querySelector('#readout')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
     announce(`Inspection complete. ${currentAudit.records.length} unique bookmarks are ready.`);
@@ -291,23 +315,50 @@ window.addEventListener('offline', render);
 window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault(); installPrompt = event as typeof installPrompt; render(); });
 
 async function start(): Promise<void> {
-  try { restorableAudit = await loadAudit(); } catch { /* Private browsing may deny IndexedDB. The tool still works. */ }
+  if (demoMode) {
+    sourceContent = sample;
+    sourceName = 'sample-bookmarks.html';
+    currentAudit = auditForDestination(parseBookmarkExport(sourceContent, sourceName), 'neutral');
+    try { await saveAudit(currentAudit, 'demo'); } catch { /* Demo still works when IndexedDB is unavailable. */ }
+  } else try { restorableAudit = await loadAudit('real'); } catch { /* Private browsing may deny IndexedDB. The tool still works. */ }
   render();
+  if (demoMode) requestAnimationFrame(() => document.querySelector('#readout')?.scrollIntoView({ block: 'start' }));
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
+      const showUpdate = (worker: ServiceWorker): void => {
+        const toast = document.querySelector<HTMLElement>('.update-toast');
+        if (!toast) return;
+        toast.hidden = false;
+        toast.querySelector('button')?.addEventListener('click', () => {
+          acceptedUpdate = true;
+          const button = toast.querySelector<HTMLButtonElement>('button');
+          if (button) { button.disabled = true; button.textContent = 'Updating…'; }
+          worker.postMessage('SKIP_WAITING');
+        }, { once: true });
+      };
+      if (registration.waiting && navigator.serviceWorker.controller) showUpdate(registration.waiting);
       registration.addEventListener('updatefound', () => {
         const worker = registration.installing;
         worker?.addEventListener('statechange', () => {
-          if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-            const toast = document.querySelector<HTMLElement>('.update-toast'); if (!toast) return;
-            toast.hidden = false; toast.querySelector('button')?.addEventListener('click', () => { acceptedUpdate = true; worker.postMessage('SKIP_WAITING'); });
-          }
+          if (worker.state === 'installed' && navigator.serviceWorker.controller) showUpdate(worker);
         });
       });
       navigator.serviceWorker.addEventListener('controllerchange', () => { if (acceptedUpdate) window.location.reload(); });
     } catch { /* Offline fallback remains available when registration is unsupported. */ }
   }
+}
+
+async function resetDemo(): Promise<void> {
+  await clearAudit('demo');
+  sourceContent = sample;
+  sourceName = 'sample-bookmarks.html';
+  currentAudit = auditForDestination(parseBookmarkExport(sourceContent, sourceName), 'neutral');
+  activeTab = 'summary';
+  await saveAudit(currentAudit, 'demo');
+  render();
+  document.querySelector('#readout')?.scrollIntoView({ behavior: 'auto', block: 'start' });
+  announce('Demo reset to the original sample.');
 }
 
 start();
